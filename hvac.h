@@ -64,35 +64,21 @@ enum hardwareItems {HI_Comp1,
 };
 
 
-
+#ifdef WIN32
 extern std::string hvacHardwareItemsNames[HI_SizeOf];
 extern std::string hvacModeNames[M_SizeOf];
 extern std::string hvacFanModeNames[FM_SizeOf];
 extern std::string hvacHardwareModeNames[HM_SizeOf];
+#endif
+#ifdef PLATFORMIO
+extern char *hvacHardwareItemsNames[];
+extern char *hvacModeNames[];
+extern char *hvacFanModeNames[];
+extern char *hvacHardwareModeNames[];
+#endif
 extern bool isAvailable[HI_SizeOf];
 extern bool isNotDisabled[HI_SizeOf];
 
-
-class Arrays {
-public:
-    const std::string hvacHardwareItemsNames[HI_SizeOf] = {"Compressor 1",
-                                "Compressor 2",
-                                "Gas Heater",
-                                "Reversing Valve",
-                                "Fan Low",
-                                "Fan High",
-                                "Coach Heat Low",
-                                "Coach Heat High"
-    };
-
-    const std::string hvacModeNames[M_SizeOf] = {"Off", "Cool", "Heat", "Auto"};
-    const std::string hvacFanModeNames[FM_SizeOf] = {"Auto", "Low", "High", "Circulate"};
-    const std::string hvacHardwareModeNames[HM_SizeOf] = {"Off", "Low Cool", "High Cool", "Low Heat", "High Heat", "Max Heat", "Low Fan", "High Fan"};
-
-    bool isAvailable[HI_SizeOf] = {true,true,true,true,true,true,true,true};
-    bool isNotDisabled[HI_SizeOf] = {true,true,true,true,true,true,true,true};
-
-};
 //system parameters in milliseconds
 
 //milliseconds between goal state calculations (60000)

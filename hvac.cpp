@@ -36,7 +36,7 @@ unsigned long timeNow() {
     #endif
 };
 
-
+#ifdef WIN32
 std::string hvacHardwareItemsNames[HI_SizeOf] = {"Compressor 1",
                              "Compressor 2",
                              "Gas Heater",
@@ -50,7 +50,23 @@ std::string hvacHardwareItemsNames[HI_SizeOf] = {"Compressor 1",
 std::string hvacModeNames[M_SizeOf] = {"Off", "Cool", "Heat", "Auto"};
 std::string hvacFanModeNames[FM_SizeOf] = {"Auto", "Low", "High", "Circulate"};
 std::string hvacHardwareModeNames[HM_SizeOf] = {"Off", "Low Cool", "High Cool", "Low Heat", "High Heat", "Max Heat", "Low Fan", "High Fan"};
+#endif
 
+#ifdef PLATFORMIO
+char *hvacHardwareItemsNames[] = {"Compressor 1",
+                             "Compressor 2",
+                             "Gas Heater",
+                             "Reversing Valve",
+                             "Fan Low",
+                             "Fan High",
+                             "Coach Heat Low",
+                             "Coach Heat High"
+};
+
+char *hvacModeNames[] = {"Off", "Cool", "Heat", "Auto"};
+char *hvacFanModeNames[] = {"Auto", "Low", "High", "Circulate"};
+char *hvacHardwareModeNames[] = {"Off", "Low Cool", "High Cool", "Low Heat", "High Heat", "Max Heat", "Low Fan", "High Fan"};
+#endif
 bool isAvailable[HI_SizeOf] = {true,true,true,true,true,true,true,true};
 bool isNotDisabled[HI_SizeOf] = {true,true,true,true,true,true,true,true};
 
