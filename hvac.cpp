@@ -39,7 +39,7 @@ unsigned long timeNow() {
 };
 
 #ifdef WIN32
-std::string hvacHardwareItemsNames[HI_SizeOf] = {"Compressor 1",
+const std::string hvacHardwareItemsNames[HI_SizeOf] = {"Compressor 1",
                              "Compressor 2",
                              "Gas Heater",
                              "Reversing Valve",
@@ -49,13 +49,13 @@ std::string hvacHardwareItemsNames[HI_SizeOf] = {"Compressor 1",
                              "Coach Heat High"
 };
 
-std::string hvacModeNames[M_SizeOf] = {"Off", "Cool", "Heat", "Auto"};
-std::string hvacFanModeNames[FM_SizeOf] = {"Auto", "Low", "High", "Circulate"};
-std::string hvacHardwareModeNames[HM_SizeOf] = {"Off", "Low Cool", "High Cool", "Low Heat", "High Heat", "Max Heat", "Low Fan", "High Fan"};
+const std::string hvacModeNames[M_SizeOf] = {"Off", "Cool", "Heat", "Auto"};
+const std::string hvacFanModeNames[FM_SizeOf] = {"Auto", "Low", "High", "Circulate"};
+const std::string hvacHardwareModeNames[HM_SizeOf] = {"Off", "Low Cool", "High Cool", "Low Heat", "High Heat", "Max Heat", "Low Fan", "High Fan"};
 #endif
 
 #ifdef PLATFORMIO
-char *hvacHardwareItemsNames[] = {"Compressor 1",
+const char *hvacHardwareItemsNames[] = {"Compressor 1",
                              "Compressor 2",
                              "Gas Heater",
                              "Reversing Valve",
@@ -65,9 +65,9 @@ char *hvacHardwareItemsNames[] = {"Compressor 1",
                              "Coach Heat High"
 };
 
-char *hvacModeNames[] = {"Off", "Cool", "Heat", "Auto"};
-char *hvacFanModeNames[] = {"Auto", "Low", "High", "Circulate"};
-char *hvacHardwareModeNames[] = {"Off", "Low Cool", "High Cool", "Low Heat", "High Heat", "Max Heat", "Low Fan", "High Fan"};
+const char *hvacModeNames[] = {"Off", "Cool", "Heat", "Auto"};
+const char *hvacFanModeNames[] = {"Auto", "Low", "High", "Circulate"};
+const char *hvacHardwareModeNames[] = {"Off", "Low Cool", "High Cool", "Low Heat", "High Heat", "Max Heat", "Low Fan", "High Fan"};
 #endif
 bool isAvailable[HI_SizeOf] = {true,true,true,true,true,true,true,true};
 bool isNotDisabled[HI_SizeOf] = {true,true,true,true,true,true,true,true};
@@ -84,14 +84,17 @@ Hvac::Hvac(byte OutputPinNumber, hardwareItems me) :
     h_pin(OutputPinNumber),
     h_me(me)
 {
-    debugI(hvacHardwareItemsNames[h_me]);
+    
     #ifdef PLATFORMIO
         pinMode(h_pin, OUTPUT);
         digitalWrite(h_pin, HARDWAREOFF);
     #endif
+    #ifdef WIN32
+    debugI(hvacHardwareItemsNames[h_me]);
     debugI(" Constructor PIN #");
     debugI(h_pin);
     debuglnI(" setup now");
+    #endif
 }
 
 void Hvac::Start() {
@@ -124,19 +127,25 @@ void Hvac::Poll() {} //fitting conventions for hvacItems
 ///////////////////////////////////////////////////////////////////////////////
 //constructors for HvacItem wrapper class, depending on type.
 HvacItem::HvacItem (Compressor* compressor) {
+    #ifdef WIN32
     debuglnI("hvacItem Constructor compressor");
+    #endif
     m_compressor = compressor; 
     m_type = 1;
 }
 
 HvacItem::HvacItem (Hvac* onOff) {
+    #ifdef WIN32
     debuglnI("hvacItem Constructor hvac");
+    #endif
     m_onOff = onOff; 
     m_type = 2;
 }
 
 HvacItem::HvacItem (ReversingValve* reverse) {
+    #ifdef WIN32
     debuglnI("hvacItem Constructor reverse");
+    #endif
     m_reverse = reverse; 
     m_type = 3;
 }
@@ -152,17 +161,19 @@ Compressor::Compressor(byte OutputPinNumber, hardwareItems me) :
     m_stopTime(timeNow()),
     m_startTime(0),
     m_compressorRunTime(0),
-    h_me(me)
+    h_me(me),
+    m_outputPin(OutputPinNumber)
 {
-    debugI(hvacHardwareItemsNames[h_me]);
-    m_outputPin = OutputPinNumber;
     #ifdef PLATFORMIO
         pinMode(m_outputPin, OUTPUT);
         digitalWrite(m_outputPin, HARDWAREOFF);
     #endif
+    #ifdef WIN32
+    debugI(hvacHardwareItemsNames[h_me]);
     debugI(" Constructor PIN #");
     debugI(m_outputPin);
     debuglnI(" setup now");
+    #endif
 }
 
 
@@ -278,14 +289,17 @@ ReversingValve::ReversingValve(byte OutputPinNumber, hardwareItems me) :
     h_me(me),
     m_outputPin(OutputPinNumber)
 {
-    debugI(hvacHardwareItemsNames[h_me]);
+    
     #ifdef PLATFORMIO
         pinMode(m_outputPin, OUTPUT);
         digitalWrite(m_outputPin, HARDWAREOFF);
     #endif
+    #ifdef WIN32
+    debugI(hvacHardwareItemsNames[h_me]);
     debugI(" Constructor PIN #");
     debugI(m_outputPin);
     debuglnI(" setup now");
+    #endif
 }
 
 

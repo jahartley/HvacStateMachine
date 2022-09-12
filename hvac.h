@@ -70,16 +70,16 @@ enum hardwareItems {HI_Comp1,
 
 
 #ifdef WIN32
-extern std::string hvacHardwareItemsNames[HI_SizeOf];
-extern std::string hvacModeNames[M_SizeOf];
-extern std::string hvacFanModeNames[FM_SizeOf];
-extern std::string hvacHardwareModeNames[HM_SizeOf];
+extern const std::string hvacHardwareItemsNames[HI_SizeOf];
+extern const std::string hvacModeNames[M_SizeOf];
+extern const std::string hvacFanModeNames[FM_SizeOf];
+extern const std::string hvacHardwareModeNames[HM_SizeOf];
 #endif
 #ifdef PLATFORMIO
-extern char *hvacHardwareItemsNames[];
-extern char *hvacModeNames[];
-extern char *hvacFanModeNames[];
-extern char *hvacHardwareModeNames[];
+extern const char *hvacHardwareItemsNames[];
+extern const char *hvacModeNames[];
+extern const char *hvacFanModeNames[];
+extern const char *hvacHardwareModeNames[];
 #endif
 extern bool isAvailable[HI_SizeOf];
 extern bool isNotDisabled[HI_SizeOf];
