@@ -13,16 +13,18 @@
  */
 
 
-#define DebugV                  //verbose debuging info... lots of info
-#define DebugI                  //important debug info...
 
 #include "hvac.h"
 #include "JAHdebug.h"
+
+#ifdef WIN32
 #include <string>
+#endif
 
 #ifdef PLATFORMIO
   #include <Arduino.h>
 #endif
+
 
 
 /// @brief Gets current tick time depending on environment
@@ -85,7 +87,7 @@ Hvac::Hvac(byte OutputPinNumber, hardwareItems me) :
     debugI(hvacHardwareItemsNames[h_me]);
     #ifdef PLATFORMIO
         pinMode(h_pin, OUTPUT);
-        digitalWrite(h_pin, LOW);
+        digitalWrite(h_pin, HARDWAREOFF);
     #endif
     debugI(" Constructor PIN #");
     debugI(h_pin);
@@ -98,7 +100,7 @@ void Hvac::Start() {
     debugI(hvacHardwareItemsNames[h_me]);
     debuglnI(" Starting...");
     #ifdef PLATFORMIO
-        digitalWrite(h_pin, HIGH);
+        digitalWrite(h_pin, HARDWAREON);
     #endif
     h_isOn = true;
     h_startTime = timeNow();    
@@ -110,7 +112,7 @@ void Hvac::Stop() {
     debugI(hvacHardwareItemsNames[h_me]);
     debugI(" Stopping... run time: ");
     #ifdef PLATFORMIO
-        digitalWrite(h_pin, LOW);
+        digitalWrite(h_pin, HARDWAREOFF);
     #endif
     h_isOn = false;
     h_runTime = h_runTime + ((timeNow() - h_startTime)/1000);
@@ -156,7 +158,7 @@ Compressor::Compressor(byte OutputPinNumber, hardwareItems me) :
     m_outputPin = OutputPinNumber;
     #ifdef PLATFORMIO
         pinMode(m_outputPin, OUTPUT);
-        digitalWrite(m_outputPin, LOW);
+        digitalWrite(m_outputPin, HARDWAREOFF);
     #endif
     debugI(" Constructor PIN #");
     debugI(m_outputPin);
@@ -201,7 +203,7 @@ STATE_DEFINE(Compressor, Stopc, NoEventData)
     m_delayActive = false;
     m_isOn = false;
     #ifdef PLATFORMIO
-        digitalWrite(m_outputPin, LOW);
+        digitalWrite(m_outputPin, HARDWAREOFF);
     #endif
 }
 
@@ -245,7 +247,7 @@ STATE_DEFINE(Compressor, Run, NoEventData)
     m_delayActive = false;
     m_startTime = timeNow();
     #ifdef PLATFORMIO
-        digitalWrite(m_outputPin, HIGH);
+        digitalWrite(m_outputPin, HARDWAREON);
     #endif
 }
 
@@ -253,7 +255,7 @@ EXIT_DEFINE(Compressor, RunExit)
 {
     //Turn off and set stop time...
     #ifdef PLATFORMIO
-        digitalWrite(m_outputPin, LOW);
+        digitalWrite(m_outputPin, HARDWAREOFF);
     #endif
     m_stopTime = timeNow();
     m_compressorRunTime = m_compressorRunTime + ((m_stopTime - m_startTime)/1000);
@@ -279,7 +281,7 @@ ReversingValve::ReversingValve(byte OutputPinNumber, hardwareItems me) :
     debugI(hvacHardwareItemsNames[h_me]);
     #ifdef PLATFORMIO
         pinMode(m_outputPin, OUTPUT);
-        digitalWrite(m_outputPin, LOW);
+        digitalWrite(m_outputPin, HARDWAREOFF);
     #endif
     debugI(" Constructor PIN #");
     debugI(m_outputPin);
@@ -332,7 +334,7 @@ STATE_DEFINE(ReversingValve, Stopc, NoEventData)
     }
     m_isOn = false;
       #ifdef PLATFORMIO
-        digitalWrite(m_outputPin, LOW);
+        digitalWrite(m_outputPin, HARDWAREOFF);
     #endif
 }
 
@@ -395,7 +397,7 @@ STATE_DEFINE(ReversingValve, Run, NoEventData)
     m_delayActive = false;
     m_startTime = timeNow();
     #ifdef PLATFORMIO
-        digitalWrite(m_outputPin, HIGH);
+        digitalWrite(m_outputPin, HARDWAREON);
     #endif
 
 }

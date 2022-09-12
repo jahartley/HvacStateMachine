@@ -19,10 +19,11 @@
 #pragma once
 
 #include "StateMachine.h"
-#include <string>
+
 
 #ifdef WIN32
 #include <windows.h>
+#include <string>
 #include <chrono>
 using std::chrono::duration_cast;
 using std::chrono::milliseconds;
@@ -33,6 +34,10 @@ using std::chrono::system_clock;
 #ifdef PLATFORMIO
 #include <Arduino.h>
 #endif
+
+#define HARDWAREOFF HIGH
+#define HARDWAREON LOW
+
 
 /// @brief System Mode choices
 enum hvacMode{M_Off, M_Cool, M_Heat, M_Auto, M_SizeOf};
