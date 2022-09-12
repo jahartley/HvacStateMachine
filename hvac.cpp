@@ -423,7 +423,9 @@ STATE_DEFINE(ReversingValve, Run, NoEventData)
 /// @param avail pointer to array of HvacItems that is true if available
 /// @param disable pointer to array of HvacItems that is false if disabled
 hvacLogic::hvacLogic(HvacItem *itemPtr[], bool *avail, bool *disable) {
+    #ifdef WIN32
     debuglnI("Hvac Logic Constructor");
+    #endif
     h_temp = -128;
     h_nextTime = (timeNow() + LOGIC_RATE);
     h_heatSetpoint = 70;
