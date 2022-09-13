@@ -57,14 +57,15 @@ enum hardwareMode {HM_Off,
                     HM_SizeOf
 };
 /// @brief Hardware Equipment: this enum has to match order of items in HvacItem items
-enum hardwareItems {HI_Comp1, 
-                    HI_Comp2, 
+enum hardwareItems { 
                     HI_gasHeat, 
-                    HI_reversingValve, 
                     HI_FanLow, 
                     HI_FanHigh, 
                     HI_CoachHeatLow,
                     HI_CoachHeatHigh,
+                    HI_Comp1, 
+                    HI_Comp2,
+                    HI_reversingValve, 
                     HI_SizeOf //Size of HvacItem array
 };
 
@@ -87,17 +88,17 @@ extern bool isNotDisabled[HI_SizeOf];
 //system parameters in milliseconds
 
 //milliseconds between goal state calculations (60000)
-#define LOGIC_RATE 30000
+#define LOGIC_RATE 10
 //Fan to Compressor start delay in milliseconds (15000)
-#define F_T_C 15000
+#define F_T_C 1000
 //Compressor to Compressor start delay in milliseconds (15000)
-#define C_T_C 15000
+#define C_T_C 1000
 //Compressor restart delay in milliseconds (120000)
-#define C_R_D 120000
+#define C_R_D 1000
 //Reversing valve refrigerant settling time in ms (60000)
-#define R_V_D 60000
+#define R_V_D 1000
 
-unsigned long timeNow();
+unsigned long timeNow();    
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -274,6 +275,7 @@ private:
     ReversingValve* m_reverse;
 };
 
+
 /// @brief Hvac Logic class, performs all high level system logic
 class hvacLogic
 {
@@ -282,7 +284,7 @@ public:
     void Poll();
     /// @brief Sets temperature in *F to be used in determining current Hardware Mode
     /// @param temp computed or measured temperature in *F
-    void setTemp(int temp) {h_temp = temp;};
+    void setTemp(int temp);
     /// @brief Current temperature in use for determining hardware Mode
     /// @return temperature in *F
     int getTemp() {return h_temp;};
@@ -299,7 +301,7 @@ public:
     /// @brief Sets Hardware item availabilty selected by RV system parameters. Will immeadately stop item if running and set == false
     /// @param hi hardwareItems enum value ie: HI_gasHeat
     /// @param set true if available, false if not.
-    void setAvailable(int hi, bool set) {
+    void setAvailable(hardwareItems hi, bool set) {
         if (h_isAvailable[hi] != set) {
             h_isAvailable[hi] = set;
             if (!set) h_items[hi].Stop();
@@ -308,10 +310,20 @@ public:
     /// @brief Sets Hardware item availabilty selected by the user. Will immeadately stop item if running and set == false
     /// @param hi hardwareItems enum value ie: HI_gasHeat
     /// @param set true if available, false if not. 
-    void setNotDisable(int hi, bool set) {
+    void setNotDisable(hardwareItems hi, bool set) {
         if (h_isNotDisabled[hi] != set) {
             h_isNotDisabled[hi] = set;
             if (!set) h_items[hi].Stop();
+        }
+    };
+    /// @brief Check if hardware item is useable (against available and notDisabled)
+    /// @param hi hardwareItems enum value ie: HI_gasHeat
+    /// @return true if useable, false if not.
+    bool h_isUseable(hardwareItems hi) {
+        if (h_isAvailable[hi] && h_isNotDisabled[hi]) {
+            return true;
+        } else {
+            return false;
         }
     };
 
@@ -319,16 +331,6 @@ private:
     HvacItem* h_items; //pointer to array of hardware
     bool* h_isAvailable; //pointer to array of availability
     bool* h_isNotDisabled; //pointer to array of disabled
-    /// @brief Check if hardware item is useable (against available and notDisabled)
-    /// @param hi hardwareItems enum value ie: HI_gasHeat
-    /// @return true if useable, false if not.
-    bool h_isUseable(int hi) {
-        if (h_isAvailable[hi] && h_isNotDisabled[hi]) {
-            return true;
-        } else {
-            return false;
-        }
-    };
     /// @brief Set the goal state and cancel any in use delays
     /// @param hm hardwareMode enum value ie: HM_LowCool
     void h_setGoalState(hardwareMode hm) {
@@ -348,6 +350,96 @@ private:
     unsigned long h_nextTime;
     unsigned long h_tempDelay;
     bool h_tempDelayActive;
+};
+
+
+/// @brief Hvac Logic class, performs all high level system logic
+class hvacLogic2
+{
+public:
+    hvacLogic2(bool *avail, bool *disable, 
+                Hvac *a, Hvac *b, 
+                Hvac *c, Hvac *d, 
+                Hvac *e, Compressor *f,
+                Compressor *g, ReversingValve *h);
+    void Poll();
+    /// @brief Sets temperature in *F to be used in determining current Hardware Mode
+    /// @param temp computed or measured temperature in *F
+    void setTemp(int temp);
+    /// @brief Current temperature in use for determining hardware Mode
+    /// @return temperature in *F
+    int getTemp() {return h_temp;};
+    void setMode(hvacMode mode);
+    void setFanMode(hvacFanMode mode);
+    bool setCoolSetpoint(int temp);
+    bool setHeatSetpoint(int temp);
+    /// @brief Gets current cooling setpoint
+    /// @return cooling setpoint temperature in *F
+    int getCoolSetpoint() {return h_coolSetpoint;};
+    /// @brief Gets current heating setpoint
+    /// @return heating setpoint temperature in *F
+    int getHeatSetpoint() {return h_heatSetpoint;};
+    /// @brief Sets Hardware item availabilty selected by RV system parameters. Will immeadately stop item if running and set == false
+    /// @param hi hardwareItems enum value ie: HI_gasHeat
+    /// @param set true if available, false if not.
+    void setAvailable(hardwareItems hi, bool set) {
+        if (h_isAvailable[hi] != set) {
+            h_isAvailable[hi] = set;
+            //if (!set) h_items[hi].Stop();
+        }
+    };
+    /// @brief Sets Hardware item availabilty selected by the user. Will immeadately stop item if running and set == false
+    /// @param hi hardwareItems enum value ie: HI_gasHeat
+    /// @param set true if available, false if not. 
+    void setNotDisable(hardwareItems hi, bool set) {
+        if (h_isNotDisabled[hi] != set) {
+            h_isNotDisabled[hi] = set;
+            //if (!set) h_items[hi].Stop();
+        }
+    };
+    /// @brief Check if hardware item is useable (against available and notDisabled)
+    /// @param hi hardwareItems enum value ie: HI_gasHeat
+    /// @return true if useable, false if not.
+    bool h_isUseable(hardwareItems hi) {
+        if (h_isAvailable[hi] && h_isNotDisabled[hi]) {
+            return true;
+        } else {
+            return false;
+        }
+    };
+
+private:
+    //HvacItem* h_items; //pointer to array of hardware
+    bool* h_isAvailable; //pointer to array of availability
+    bool* h_isNotDisabled; //pointer to array of disabled
+    /// @brief Set the goal state and cancel any in use delays
+    /// @param hm hardwareMode enum value ie: HM_LowCool
+    void h_setGoalState(hardwareMode hm) {
+        if (h_goalState == hm) return;
+        //now changing states, cancel any delay timers
+        h_tempDelayActive = false;
+        h_tempDelay = timeNow();
+        h_goalState = hm;
+    };
+    int h_temp; //current temperature in *F used for hardware mode logic
+    int h_heatSetpoint; //current heat setpoint *F
+    int h_coolSetpoint; //current cool setpoint *F
+    hvacMode h_currentMode; //current System Mode ie: M_Off
+    hvacFanMode h_fanMode; //current System Fan Mode ie: FM_Auto
+    hvacFanMode h_userFanMode; //user requested Fan Mode ie: FM_Auto
+    hardwareMode h_goalState; //current System hardware goal state ie: HM_LowCool
+    unsigned long h_nextTime;
+    unsigned long h_tempDelay;
+    bool h_tempDelayActive;
+
+    Hvac* h_gasHeater;
+    Hvac* h_fanLow;
+    Hvac* h_fanHigh;
+    Hvac* h_coachHeatLow;
+    Hvac* h_coachHeatHigh;
+    Compressor* h_compressor1;
+    Compressor* h_compressor2;
+    ReversingValve* h_reversingValve;
 };
 
 
